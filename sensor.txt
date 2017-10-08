@@ -1,0 +1,38 @@
+#include <math.h>
+int ThermPin = 0;
+int V;
+float R1 = 10000;
+float b = 3435;
+float t0 = 273.15;
+float Adc = 1;
+float logR,T,R,Tc,Tf,Rt;
+
+void setup(){
+  Serial.begin(9600);
+}
+
+float Calc(float Adc)
+{
+  V = analogRead(ThermPin);
+  R = (1024/Adc - 1);
+  logR = log(R);
+  T  = 1.0 / (1/(V+t0) + 1/b * logR);
+  Tc = T - 273.15;
+  Rt = R1*exp(b * (1/T - 1/(V+t0)));
+  
+  return Rt;
+}
+void loop()
+{
+  while(Adc<=1024)
+  {
+    Serial.print("Temperature: ");   
+    Serial.print(Tc);
+    Serial.println(" C;"); 
+    Serial.print(Calc(Adc));
+    Serial.print("Rt; "); 
+    delay(500);
+    Adc++;
+  }
+}
+
